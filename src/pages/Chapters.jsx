@@ -4,8 +4,8 @@ import Dialog from '../components/Dialog';
 import { isOverdue, formatDateReadable } from '../utils/dateHelpers';
 
 export default function Chapters({
-  books,
-  chapters,
+  books = [],
+  chapters = [],
   currentDate,
   addToast,
   selectedBookId,

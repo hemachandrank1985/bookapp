@@ -2,7 +2,7 @@ import React from 'react';
 import { BookOpen, BookMarked, CheckCircle, Clock, AlertTriangle, Calendar, User, ArrowRight } from 'lucide-react';
 import { isOverdue, formatDateReadable, getDaysDifference } from '../utils/dateHelpers';
 
-export default function Dashboard({ books, chapters, currentDate, setCurrentTab, setSelectedBookId }) {
+export default function Dashboard({ books = [], chapters = [], currentDate, setCurrentTab, setSelectedBookId }) {
   // 1. Calculations
   const totalBooks = books.length;
   const totalChapters = chapters.length;

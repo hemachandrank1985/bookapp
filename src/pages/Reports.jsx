@@ -2,7 +2,7 @@ import React from 'react';
 import { FileSpreadsheet, FileText, Printer, ShieldAlert } from 'lucide-react';
 import { isOverdue } from '../utils/dateHelpers';
 
-export default function Reports({ books, chapters, currentDate, addToast }) {
+export default function Reports({ books = [], chapters = [], currentDate, addToast }) {
   // 1. Calculate reports summary data per book
   const reportsData = React.useMemo(() => {
     return books.map(book => {

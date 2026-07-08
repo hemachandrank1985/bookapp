@@ -3,10 +3,10 @@ import { Bell, Clock, AlertTriangle, ShieldAlert, Eye, CheckCircle2 } from 'luci
 import { isOverdue, isDueWithinRange, formatDateReadable } from '../utils/dateHelpers';
 
 export default function Notifications({
-  books,
-  chapters,
+  books = [],
+  chapters = [],
   currentDate,
-  acknowledgedAlertKeys,
+  acknowledgedAlertKeys = [],
   setAcknowledgedAlertKeys,
   addToast,
   setCurrentTab,

@@ -3,7 +3,7 @@ import { Mail, ShieldAlert, Award, FileText, Send, Check } from 'lucide-react';
 import Dialog from '../components/Dialog';
 import { isOverdue, formatDateReadable } from '../utils/dateHelpers';
 
-export default function Authors({ books, chapters, currentDate, addToast }) {
+export default function Authors({ books = [], chapters = [], currentDate, addToast }) {
   const [selectedAuthorEmail, setSelectedAuthorEmail] = useState(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 

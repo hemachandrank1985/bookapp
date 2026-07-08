@@ -70,13 +70,16 @@ export default function App() {
           managersRes.json()
         ]);
 
-        setBooks(booksData);
-        setChapters(chaptersData);
-        setManagers(managersData);
+        setBooks(Array.isArray(booksData) ? booksData : []);
+        setChapters(Array.isArray(chaptersData) ? chaptersData : []);
+        setManagers(Array.isArray(managersData) ? managersData : []);
       }
     } catch (err) {
       console.error('Error fetching database records:', err);
       addToast('Error communicating with the database server.', 'error');
+      setBooks([]);
+      setChapters([]);
+      setManagers([]);
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +189,45 @@ export default function App() {
     return count;
   }, [visibleChapters, currentDate, acknowledgedAlertKeys, currentUser]);
 
-  // Redirect to Registration or Login if not authenticated
+  // 1. Show database loading spinner first to avoid login page setup flashes
+  if (isLoading) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: '#0b0f19',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '4px solid rgba(255, 255, 255, 0.1)',
+          borderTopColor: 'var(--accent-primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+          Syncing database...
+        </span>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // 2. Redirect to Registration or Login if not authenticated
   if (!currentUser) {
     if (isRegisteringAdmin || adminsCount === 0) {
       return (
@@ -325,41 +366,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {isLoading && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(11, 15, 25, 0.7)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          flexDirection: 'column',
-          gap: '1rem'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid rgba(255, 255, 255, 0.1)',
-            borderTopColor: 'var(--accent-primary)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-            Syncing database...
-          </span>
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-      )}
 
       <Sidebar
         currentTab={currentTab}

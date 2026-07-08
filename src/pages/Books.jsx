@@ -4,13 +4,13 @@ import Dialog from '../components/Dialog';
 import { formatDateReadable } from '../utils/dateHelpers';
 
 export default function Books({
-  books,
-  chapters,
+  books = [],
+  chapters = [],
   addToast,
   setCurrentTab,
   setSelectedBookId,
   currentUser,
-  managers,
+  managers = [],
   refreshData
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
