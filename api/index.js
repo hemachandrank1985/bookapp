@@ -13,8 +13,13 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection String
-const MONGODB_URI = 'mongodb+srv://hemachandrank1985_db_user:Woxsen%40123@book.91zfpkl.mongodb.net/bookflow?retryWrites=true&w=majority&appName=Book';
+// MongoDB Connection String (loaded from environment)
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('CRITICAL: MONGODB_URI environment variable is not defined.');
+  process.exit(1);
+}
 
 console.log('Connecting to MongoDB...');
 mongoose.connect(MONGODB_URI)
