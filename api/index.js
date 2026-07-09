@@ -116,6 +116,12 @@ app.post('/api/auth/register-admin', async (req, res) => {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
+    // Limit to only 1 Admin account in the database
+    const adminCount = await Admin.countDocuments();
+    if (adminCount >= 1) {
+      return res.status(400).json({ error: 'An Administrator account already exists. Only one Admin account is allowed.' });
+    }
+
     const existingAdmin = await Admin.findOne({ email: email.toLowerCase() });
     if (existingAdmin) {
       return res.status(400).json({ error: 'Admin email is already registered.' });
@@ -143,24 +149,36 @@ app.post('/api/auth/login', async (req, res) => {
 
     const cleanEmail = email.toLowerCase();
 
-    // Check Admins
-    const admin = await Admin.findOne({ email: cleanEmail, password });
-    if (admin) {
+    // Check if account exists first
+    const existingAdmin = await Admin.findOne({ email: cleanEmail });
+    const existingManager = await Manager.findOne({ email: cleanEmail });
+
+    if (!existingAdmin && !existingManager) {
+      return res.status(404).json({ error: 'Account does not exist. Kindly create an account.' });
+    }
+
+    // Check credentials for Admin
+    if (existingAdmin) {
+      if (existingAdmin.password !== password) {
+        return res.status(400).json({ error: 'Incorrect password.' });
+      }
       return res.json({
-        id: admin.id,
-        name: admin.name,
-        email: admin.email,
+        id: existingAdmin.id,
+        name: existingAdmin.name,
+        email: existingAdmin.email,
         role: 'Admin'
       });
     }
 
-    // Check Managers
-    const manager = await Manager.findOne({ email: cleanEmail, password });
-    if (manager) {
+    // Check credentials for Manager
+    if (existingManager) {
+      if (existingManager.password !== password) {
+        return res.status(400).json({ error: 'Incorrect password.' });
+      }
       return res.json({
-        id: manager.id,
-        name: manager.name,
-        email: manager.email,
+        id: existingManager.id,
+        name: existingManager.name,
+        email: existingManager.email,
         role: 'Manager'
       });
     }

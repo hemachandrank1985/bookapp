@@ -245,6 +245,7 @@ export default function App() {
     return (
       <>
         <Login
+          adminsCount={adminsCount}
           onLogin={(credentials) => handleLoginSubmit(credentials.email, credentials.password)}
           onNavigateToRegister={() => setIsRegisteringAdmin(true)}
           addToast={addToast}

@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 
-export default function Login({ onLogin, onNavigateToRegister, addToast }) {
+export default function Login({ adminsCount = 0, onLogin, onNavigateToRegister, addToast }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -68,15 +68,17 @@ export default function Login({ onLogin, onNavigateToRegister, addToast }) {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
-          <Button 
-            variant="outline" 
-            onClick={onNavigateToRegister}
-            className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
-          >
-            Register new Admin Account
-          </Button>
-        </CardFooter>
+        {adminsCount === 0 && (
+          <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
+            <Button 
+              variant="outline" 
+              onClick={onNavigateToRegister}
+              className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
+            >
+              Register new Admin Account
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );
