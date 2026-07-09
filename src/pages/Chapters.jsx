@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, ArrowUpDown, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
-import Dialog from '../components/Dialog';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../components/ui/table';
 import { isOverdue, formatDateReadable } from '../utils/dateHelpers';
 
 export default function Chapters({
@@ -363,88 +367,92 @@ export default function Chapters({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="flex flex-col gap-6 w-full">
       {/* Page Header */}
-      <div className="page-header">
-        <div className="page-title-group">
-          <h1>Chapter Tracker</h1>
-          <span className="page-subtitle">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold tracking-tight text-white">Chapter Tracker</h1>
+          <span className="text-sm text-slate-400">
             {isManager 
               ? 'Manager Dashboard: View, edit progress, alter deadlines, and add comments' 
               : 'Administrator View: Read-only summary of active chapter submissions'}
           </span>
         </div>
         {isManager && (
-          <button className="btn btn-primary" onClick={handleAddClick} disabled={!selectedBookId || selectedBookId === 'All'}>
-            <Plus size={16} />
+          <Button
+            onClick={handleAddClick}
+            disabled={!selectedBookId || selectedBookId === 'All'}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium gap-1"
+          >
+            <Plus className="h-4 w-4" />
             Add Chapter
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Book selector & filters */}
-      <div className="filter-row">
-        <div className="filter-item">
-          <label className="form-label">Active Book Project</label>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 bg-slate-900/20 p-4 rounded-xl border border-white/5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-400">Active Book Project</label>
           <select
-            className="form-select"
+            className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
             value={selectedBookId || 'All'}
             onChange={e => setSelectedBookId(e.target.value === 'All' ? 'All' : String(e.target.value))}
           >
-            <option value="All">All Books</option>
+            <option value="All" className="bg-slate-950 text-white">All Books</option>
             {books.map(b => (
-              <option key={b.id} value={b.id}>{b.title}</option>
+              <option key={b.id} value={b.id} className="bg-slate-950 text-white">{b.title}</option>
             ))}
           </select>
         </div>
 
-        <div className="filter-item">
-          <label className="form-label">Status Filter</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-400">Status Filter</label>
           <select
-            className="form-select"
+            className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
           >
-            <option value="All">All Statuses</option>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Submitted">Submitted</option>
-            <option value="Under Review">Under Review</option>
-            <option value="Revision Requested">Revision Requested</option>
-            <option value="Completed">Completed</option>
-            <option value="Overdue">Overdue</option>
+            <option value="All" className="bg-slate-950 text-white">All Statuses</option>
+            <option value="Not Started" className="bg-slate-950 text-white">Not Started</option>
+            <option value="In Progress" className="bg-slate-950 text-white">In Progress</option>
+            <option value="Submitted" className="bg-slate-950 text-white">Submitted</option>
+            <option value="Under Review" className="bg-slate-950 text-white">Under Review</option>
+            <option value="Revision Requested" className="bg-slate-950 text-white">Revision Requested</option>
+            <option value="Completed" className="bg-slate-950 text-white">Completed</option>
+            <option value="Overdue" className="bg-slate-950 text-white">Overdue</option>
           </select>
         </div>
 
-        <div className="filter-item" style={{ flex: 1.5 }}>
-          <label className="form-label">Search Author</label>
-          <div className="filter-input-search">
-            <Search size={14} />
-            <input
+        <div className="flex flex-col gap-1.5 md:col-span-1">
+          <label className="text-xs font-semibold text-slate-400">Search Author</label>
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 h-4 w-4 text-slate-500" />
+            <Input
               type="text"
-              className="form-input"
-              placeholder="Search by author name..."
+              className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+              placeholder="Author name..."
               value={authorSearch}
               onChange={e => setAuthorSearch(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="filter-item">
-          <label className="form-label">Due Date From</label>
-          <input
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-400">Due Date From</label>
+          <Input
             type="date"
-            className="form-input"
+            className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
           />
         </div>
 
-        <div className="filter-item">
-          <label className="form-label">Due Date To</label>
-          <input
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-400">Due Date To</label>
+          <Input
             type="date"
-            className="form-input"
+            className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
           />
@@ -453,26 +461,26 @@ export default function Chapters({
 
       {/* Chapters Table */}
       {paginatedChapters.length > 0 ? (
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
-          <div className="table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th onClick={() => toggleSort('chapterNumber')} style={{ cursor: 'pointer' }}>
-                    Ch No. <ArrowUpDown size={12} style={{ marginLeft: '4px' }} />
-                  </th>
-                  <th>Chapter Title</th>
-                  <th>Author</th>
-                  <th>Status</th>
-                  <th onClick={() => toggleSort('dueDate')} style={{ cursor: 'pointer' }}>
-                    Due Date <ArrowUpDown size={12} style={{ marginLeft: '4px' }} />
-                  </th>
-                  <th>Submitted</th>
-                  <th>Editor Notes</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+        <Card className="glass-card border-white/5 overflow-hidden shadow-md">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-slate-900/40">
+                <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableHead className="text-slate-400 font-bold w-20 cursor-pointer" onClick={() => toggleSort('chapterNumber')}>
+                    <span className="flex items-center gap-1">Ch No. <ArrowUpDown className="h-3 w-3" /></span>
+                  </TableHead>
+                  <TableHead className="text-slate-400 font-bold">Chapter Title</TableHead>
+                  <TableHead className="text-slate-400 font-bold">Author</TableHead>
+                  <TableHead className="text-slate-400 font-bold w-44">Status</TableHead>
+                  <TableHead className="text-slate-400 font-bold w-36 cursor-pointer" onClick={() => toggleSort('dueDate')}>
+                    <span className="flex items-center gap-1">Due Date <ArrowUpDown className="h-3 w-3" /></span>
+                  </TableHead>
+                  <TableHead className="text-slate-400 font-bold w-32">Submitted</TableHead>
+                  <TableHead className="text-slate-400 font-bold w-44">Editor Notes</TableHead>
+                  <TableHead className="text-slate-400 font-bold w-28">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {paginatedChapters.map(chapter => {
                   const isChapterOverdue = isOverdue(chapter.dueDate, chapter.status, currentDate);
                   
@@ -484,306 +492,318 @@ export default function Chapters({
                   else if (['Submitted', 'Under Review', 'Revision Requested'].includes(chapter.status)) statusClass = 'review';
 
                   return (
-                    <tr key={chapter.id} className={getRowClass(chapter)}>
-                      <td>{chapter.chapterNumber}</td>
-                      <td style={{ fontWeight: '600' }}>{chapter.chapterTitle}</td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span>{chapter.authorName}</span>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{chapter.authorEmail}</span>
+                    <TableRow key={chapter.id} className={`border-white/5 hover:bg-slate-900/10 ${getRowClass(chapter)}`}>
+                      <TableCell className="font-bold text-slate-300">{chapter.chapterNumber}</TableCell>
+                      <TableCell className="font-semibold text-slate-200">{chapter.chapterTitle}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-slate-200">{chapter.authorName}</span>
+                          <span className="text-[10px] text-slate-500">{chapter.authorEmail}</span>
                         </div>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {isManager ? (
                           <select
-                            className={`inline-edit-select ${statusClass}`}
+                            className={`inline-edit-select ${statusClass} rounded border border-white/5 bg-slate-900/80 px-2 py-0.5 text-xs text-white`}
                             value={chapter.status}
                             onChange={e => handleInlineStatusChange(chapter.id, e.target.value)}
                           >
-                            <option value="Not Started">Not Started</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Submitted">Submitted</option>
-                            <option value="Under Review">Under Review</option>
-                            <option value="Revision Requested">Revision Requested</option>
-                            <option value="Completed">Completed</option>
+                            <option value="Not Started" className="bg-slate-950 text-white">Not Started</option>
+                            <option value="In Progress" className="bg-slate-950 text-white">In Progress</option>
+                            <option value="Submitted" className="bg-slate-950 text-white">Submitted</option>
+                            <option value="Under Review" className="bg-slate-950 text-white">Under Review</option>
+                            <option value="Revision Requested" className="bg-slate-950 text-white">Revision Requested</option>
+                            <option value="Completed" className="bg-slate-950 text-white">Completed</option>
                           </select>
                         ) : (
-                          <span className={`status-badge ${statusClass}`}>
+                          <span className={`status-badge ${statusClass} text-[10px] px-2 py-0.5 rounded-full font-semibold`}>
                             {isChapterOverdue ? 'Overdue' : chapter.status}
                           </span>
                         )}
                         {isChapterOverdue && (
-                          <div style={{ fontSize: '0.65rem', color: 'var(--accent-danger)', fontWeight: 'bold', marginTop: '0.2rem' }}>
+                          <div className="text-[9px] text-red-400 font-bold mt-1">
                             Overdue Alert
                           </div>
                         )}
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {isManager ? (
                           <input
                             type="date"
-                            className="inline-edit-date"
+                            className="inline-edit-date bg-slate-900/80 border border-white/5 text-xs text-slate-300 rounded px-2 py-0.5"
                             value={chapter.dueDate || ''}
                             onChange={e => handleInlineDateChange(chapter.id, e.target.value)}
                           />
                         ) : (
-                          <span>{formatDateReadable(chapter.dueDate)}</span>
+                          <span className="text-slate-300">{formatDateReadable(chapter.dueDate)}</span>
                         )}
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell className="text-slate-300">
                         {chapter.submissionDate ? formatDateReadable(chapter.submissionDate) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Pending</span>
+                          <span className="text-slate-500 text-xs italic">Pending</span>
                         )}
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
                           <span
-                            className="text-truncate"
-                            style={{ maxWidth: '120px', display: 'inline-block', fontSize: '0.8rem', color: 'var(--text-secondary)' }}
+                            className="truncate text-xs text-slate-400"
+                            style={{ maxWidth: '100px' }}
                             title={chapter.editorNotes}
                           >
                             {chapter.editorNotes || 'No notes...'}
                           </span>
-                          <button
-                            className="inline-edit-note-btn"
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="w-6 h-6 hover:bg-slate-800 text-slate-400 hover:text-slate-200"
                             onClick={() => handleNotesClick(chapter)}
-                            title={isManager ? "Edit Notes" : "View Notes"}
                           >
-                            <FileText size={14} />
-                          </button>
+                            <FileText className="h-3.5 w-3.5" />
+                          </Button>
                         </div>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {isManager ? (
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button
-                              className="inline-edit-note-btn"
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-7 h-7 hover:bg-slate-800 text-slate-400 hover:text-slate-200"
                               onClick={() => handleEditClick(chapter)}
                               title="Edit Chapter"
                             >
-                              <Edit2 size={13} style={{ color: 'var(--text-secondary)' }} />
-                            </button>
-                            <button
-                              className="inline-edit-note-btn"
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-7 h-7 hover:bg-red-500/10 text-slate-400 hover:text-red-400"
                               onClick={() => handleDeleteClick(chapter.id, chapter.chapterTitle)}
                               title="Delete Chapter"
                             >
-                              <Trash2 size={13} style={{ color: 'var(--accent-danger)' }} />
-                            </button>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         ) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>Locked</span>
+                          <span className="text-slate-500 text-xs italic">Locked</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
 
-          {/* Pagination Controls */}
-          <div className="pagination-container">
-            <span className="pagination-info">
-              Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, totalRows)} of {totalRows} chapters
-            </span>
-            <div className="pagination-buttons">
-              <button
-                className="pagination-btn"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => prev - 1)}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                className="pagination-btn"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => prev + 1)}
-              >
-                <ChevronRight size={16} />
-              </button>
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center px-4 py-3 bg-slate-900/10 border-t border-white/5">
+              <span className="text-xs text-slate-400">
+                Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, totalRows)} of {totalRows} chapters
+              </span>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-7 h-7 border-white/10 text-slate-400 hover:bg-slate-800"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-7 h-7 border-white/10 text-slate-400 hover:bg-slate-800"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="empty-state glass-card">
-          <Search size={48} />
-          <h3>No Chapters Found</h3>
-          <p>There are no chapters registered in this project view.</p>
+        <div className="empty-state glass-card flex flex-col items-center justify-center p-12 text-center border-white/5">
+          <Search className="h-12 w-12 text-slate-500 mb-3" />
+          <h3 className="text-lg font-bold text-white mb-1">No Chapters Found</h3>
+          <p className="text-sm text-slate-400 max-w-sm mb-4">There are no chapters registered in this project view.</p>
           {isManager && selectedBookId && selectedBookId !== 'All' && (
-            <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={handleAddClick}>
-              <Plus size={16} />
+            <Button onClick={handleAddClick} className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+              <Plus className="h-4 w-4 mr-1" />
               Add Chapter
-            </button>
+            </Button>
           )}
         </div>
       )}
 
       {/* Add / Edit Chapter Modal */}
       {isManager && (
-        <Dialog
-          isOpen={isChapterModalOpen}
-          onClose={() => setIsChapterModalOpen(false)}
-          title={editingChapter ? 'Edit Chapter Details' : 'Add New Chapter'}
-        >
-          <form onSubmit={handleSaveChapter} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div className="form-group">
-              <label className="form-label">Book Project *</label>
-              <select
-                className="form-select"
-                value={bookId}
-                onChange={e => setBookId(e.target.value)}
-                required
-                disabled={editingChapter !== null}
-              >
-                <option value="" disabled>Select a book</option>
-                {books.map(b => (
-                  <option key={b.id} value={b.id}>{b.title}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid-cols-4">
-              <div className="form-group" style={{ gridColumn: 'span 1' }}>
-                <label className="form-label">Ch No. *</label>
-                <input
-                  type="number"
-                  min="1"
-                  className="form-input"
-                  value={chapterNumber}
-                  onChange={e => setChapterNumber(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group" style={{ gridColumn: 'span 3' }}>
-                <label className="form-label">Chapter Title *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Introduction to Quantum Physics"
-                  value={chapterTitle}
-                  onChange={e => setChapterTitle(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid-cols-2">
-              <div className="form-group">
-                <label className="form-label">Author Name *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Dr. Aris Vance"
-                  value={authorName}
-                  onChange={e => setAuthorName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Author Email *</label>
-                <input
-                  type="email"
-                  className="form-input"
-                  placeholder="e.g. aris.vance@example.edu"
-                  value={authorEmail}
-                  onChange={e => setAuthorEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid-cols-2">
-              <div className="form-group">
-                <label className="form-label">Due Date *</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={dueDate}
-                  onChange={e => setDueDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Status</label>
+        <Dialog open={isChapterModalOpen} onOpenChange={setIsChapterModalOpen}>
+          <DialogContent className="max-w-lg border-white/10 text-white glass-card">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-white">{editingChapter ? 'Edit Chapter Details' : 'Add New Chapter'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSaveChapter} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-slate-400">Book Project *</label>
                 <select
-                  className="form-select"
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
+                  className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                  value={bookId}
+                  onChange={e => setBookId(e.target.value)}
+                  required
+                  disabled={editingChapter !== null}
                 >
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Submitted">Submitted</option>
-                  <option value="Under Review">Under Review</option>
-                  <option value="Revision Requested">Revision Requested</option>
-                  <option value="Completed">Completed</option>
+                  <option value="" disabled className="bg-slate-950 text-slate-400">Select a book</option>
+                  {books.map(b => (
+                    <option key={b.id} value={b.id} className="bg-slate-950 text-white">{b.title}</option>
+                  ))}
                 </select>
               </div>
-            </div>
 
-            {['Submitted', 'Completed'].includes(status) && (
-              <div className="form-group">
-                <label className="form-label">Submission Date</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={submissionDate}
-                  onChange={e => setSubmissionDate(e.target.value)}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="flex flex-col gap-1.5 col-span-1">
+                  <label className="text-xs font-semibold text-slate-400">Ch No. *</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                    value={chapterNumber}
+                    onChange={e => setChapterNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 col-span-3">
+                  <label className="text-xs font-semibold text-slate-400">Chapter Title *</label>
+                  <Input
+                    type="text"
+                    className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="Introduction to Quantum Physics"
+                    value={chapterTitle}
+                    onChange={e => setChapterTitle(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Author Name *</label>
+                  <Input
+                    type="text"
+                    className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="Dr. Aris Vance"
+                    value={authorName}
+                    onChange={e => setAuthorName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Author Email *</label>
+                  <Input
+                    type="email"
+                    className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="aris.vance@example.edu"
+                    value={authorEmail}
+                    onChange={e => setAuthorEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Due Date *</label>
+                  <Input
+                    type="date"
+                    className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                    value={dueDate}
+                    onChange={e => setDueDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Status</label>
+                  <select
+                    className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                    value={status}
+                    onChange={e => setStatus(e.target.value)}
+                  >
+                    <option value="Not Started" className="bg-slate-950 text-white">Not Started</option>
+                    <option value="In Progress" className="bg-slate-950 text-white">In Progress</option>
+                    <option value="Submitted" className="bg-slate-950 text-white">Submitted</option>
+                    <option value="Under Review" className="bg-slate-950 text-white">Under Review</option>
+                    <option value="Revision Requested" className="bg-slate-950 text-white">Revision Requested</option>
+                    <option value="Completed" className="bg-slate-950 text-white">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              {['Submitted', 'Completed'].includes(status) && (
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Submission Date</label>
+                  <Input
+                    type="date"
+                    className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                    value={submissionDate}
+                    onChange={e => setSubmissionDate(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-slate-400">Editor Notes</label>
+                <textarea
+                  className="flex min-h-[60px] w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-2 text-sm shadow-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                  placeholder="Add editorial feedback or status notes..."
+                  value={editorNotes}
+                  onChange={e => setEditorNotes(e.target.value)}
                 />
               </div>
-            )}
 
-            <div className="form-group">
-              <label className="form-label">Editor Notes</label>
-              <textarea
-                className="form-textarea"
-                placeholder="Add editorial feedback or status notes..."
-                value={editorNotes}
-                onChange={e => setEditorNotes(e.target.value)}
-              />
-            </div>
-
-            <div className="dialog-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => setIsChapterModalOpen(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Save Chapter
-              </button>
-            </div>
-          </form>
+              <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-white/5">
+                <Button type="button" variant="outline" onClick={() => setIsChapterModalOpen(false)} className="border-white/10 text-slate-300 hover:bg-slate-800">
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+                  Save Chapter
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
         </Dialog>
       )}
 
       {/* Editor Notes Quick Dialog */}
-      <Dialog
-        isOpen={isNotesModalOpen}
-        onClose={() => setIsNotesModalOpen(false)}
-        title={`Notes for Ch ${noteChapter?.chapterNumber}: ${noteChapter?.chapterTitle}`}
-      >
-        <form onSubmit={handleSaveNotes}>
-          <div className="form-group">
-            <label className="form-label">Editorial Feedback & Notes</label>
-            <textarea
-              className="form-textarea"
-              style={{ minHeight: '160px' }}
-              value={editorNotes}
-              onChange={e => setEditorNotes(e.target.value)}
-              placeholder="e.g. Awaiting revision of figures..."
-              disabled={!isManager}
-            />
-          </div>
-          <div className="dialog-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setIsNotesModalOpen(false)}>
-              Cancel
-            </button>
-            {isManager && (
-              <button type="submit" className="btn btn-primary">
-                Save Notes
-              </button>
-            )}
-          </div>
-        </form>
+      <Dialog open={isNotesModalOpen} onOpenChange={setIsNotesModalOpen}>
+        <DialogContent className="max-w-md border-white/10 text-white glass-card">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-white">
+              Notes for Ch {noteChapter?.chapterNumber}: {noteChapter?.chapterTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveNotes} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Editorial Feedback & Notes</label>
+              <textarea
+                className="flex min-h-[160px] w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-2 text-sm shadow-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                value={editorNotes}
+                onChange={e => setEditorNotes(e.target.value)}
+                placeholder="Awaiting revision of figures..."
+                disabled={!isManager}
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+              <Button type="button" variant="outline" onClick={() => setIsNotesModalOpen(false)} className="border-white/10 text-slate-300 hover:bg-slate-800">
+                Cancel
+              </Button>
+              {isManager && (
+                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+                  Save Notes
+                </Button>
+              )}
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
     </div>
   );

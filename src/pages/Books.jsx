@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Eye, User, BookOpen } from 'lucide-react';
-import Dialog from '../components/Dialog';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { formatDateReadable } from '../utils/dateHelpers';
 
 export default function Books({
@@ -155,28 +158,28 @@ export default function Books({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="flex flex-col gap-6 w-full">
       {/* Page Header */}
-      <div className="page-header">
-        <div className="page-title-group">
-          <h1>Books Management</h1>
-          <span className="page-subtitle">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold tracking-tight text-white">Books Management</h1>
+          <span className="text-sm text-slate-400">
             {isAdmin 
               ? 'Administrator View: Configure books, target dates, and allocate ownership to managers' 
               : 'Project Manager View: Track submission progress for your allocated publications'}
           </span>
         </div>
         {isAdmin && (
-          <button className="btn btn-primary" onClick={handleAddClick}>
-            <Plus size={16} />
+          <Button onClick={handleAddClick} className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium gap-1">
+            <Plus className="h-4 w-4" />
             Add New Book
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Grid of Books */}
       {visibleBooks.length > 0 ? (
-        <div className="books-grid">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {visibleBooks.map(book => {
             const progress = getBookProgress(book.id, book.totalChapters);
             const manager = managers.find(m => m.id === book.assignedManagerId);
@@ -188,213 +191,214 @@ export default function Books({
             else if (book.status === 'Under Review') badgeClass = 'review';
 
             return (
-              <div key={book.id} className="book-card glass-card">
-                <div className="book-card-header">
-                  <div>
-                    <span className="book-discipline">{book.discipline}</span>
-                    <h3 className="book-title">{book.title}</h3>
+              <Card key={book.id} className="glass-card flex flex-col justify-between border-white/5 shadow-md">
+                <CardHeader className="flex flex-row justify-between items-start pb-2">
+                  <div className="flex flex-col gap-1 flex-1">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">{book.discipline}</span>
+                    <CardTitle className="text-base font-bold text-white truncate max-w-[200px]" title={book.title}>{book.title}</CardTitle>
                   </div>
-                  <span className={`status-badge ${badgeClass}`}>{book.status}</span>
-                </div>
+                  <span className={`status-badge ${badgeClass} text-[10px] font-bold px-2 py-0.5 rounded-full`}>{book.status}</span>
+                </CardHeader>
 
-                <div className="book-meta">
-                  <div className="book-meta-item">
-                    <span className="book-meta-label">Publisher</span>
-                    <span className="book-meta-value">{book.publisher}</span>
+                <CardContent className="pt-2 pb-4">
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-xs border-b border-white/5 pb-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500">Publisher</span>
+                      <span className="font-semibold text-slate-300 truncate">{book.publisher}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500">Target Date</span>
+                      <span className="font-semibold text-slate-300">{formatDateReadable(book.targetPublicationDate)}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500">Assigned Manager</span>
+                      <span className="font-semibold flex items-center gap-1 text-slate-300 truncate">
+                        <User className="h-3 w-3 text-slate-500" />
+                        {manager ? manager.name : <span className="text-orange-400">Unassigned</span>}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-slate-500">Total Chapters</span>
+                      <span className="font-semibold text-slate-300">{book.totalChapters}</span>
+                    </div>
                   </div>
-                  <div className="book-meta-item">
-                    <span className="book-meta-label">Target Date</span>
-                    <span className="book-meta-value">{formatDateReadable(book.targetPublicationDate)}</span>
-                  </div>
-                  <div className="book-meta-item">
-                    <span className="book-meta-label">Assigned Manager</span>
-                    <span className="book-meta-value" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: manager ? 'var(--text-primary)' : 'var(--accent-orange)' }}>
-                      <User size={12} />
-                      {manager ? manager.name : 'Unassigned'}
-                    </span>
-                  </div>
-                  <div className="book-meta-item">
-                    <span className="book-meta-label">Total Chapters</span>
-                    <span className="book-meta-value">{book.totalChapters}</span>
-                  </div>
-                </div>
 
-                {/* Progress bar */}
-                <div className="book-progress">
-                  <div className="book-progress-info">
-                    <span>Submission Progress</span>
-                    <span>{progress.submittedCount} / {book.totalChapters} Ch ({progress.percentage}%)</span>
+                  {/* Progress bar */}
+                  <div className="flex flex-col gap-1.5 mt-4">
+                    <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                      <span>Submission Progress</span>
+                      <span>{progress.submittedCount} / {book.totalChapters} Ch ({progress.percentage}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-indigo-500 h-1.5 rounded-full" style={{ width: `${progress.percentage}%` }}></div>
+                    </div>
                   </div>
-                  <div className="progress-bar-container">
-                    <div className="progress-bar-fill" style={{ width: `${progress.percentage}%` }}></div>
-                  </div>
-                </div>
+                </CardContent>
 
-                {/* Card Actions */}
-                <div className="book-actions">
+                <CardFooter className="flex gap-2 pt-2 border-t border-white/5 justify-end">
                   {isAdmin && (
                     <>
-                      <button
-                        className="btn btn-secondary"
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
                         onClick={() => handleEditClick(book)}
-                        title="Edit Book Details"
                       >
-                        <Edit2 size={13} />
+                        <Edit2 className="h-3 w-3 mr-1" />
                         Edit
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20"
                         onClick={() => handleDeleteClick(book.id, book.title)}
-                        title="Delete Book"
                       >
-                        <Trash2 size={13} />
+                        <Trash2 className="h-3 w-3 mr-1" />
                         Delete
-                      </button>
+                      </Button>
                     </>
                   )}
-                  <button
-                    className="btn btn-primary"
-                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', gap: '0.25rem' }}
+                  <Button
+                    size="sm"
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium"
                     onClick={() => handleViewChapters(book.id)}
-                    title="View Chapter Details"
                   >
-                    <Eye size={13} />
+                    <Eye className="h-3 w-3 mr-1" />
                     Tracker
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </CardFooter>
+              </Card>
             );
           })}
         </div>
       ) : (
-        <div className="empty-state glass-card">
-          <BookOpen size={48} />
-          <h3>No Books Allocated</h3>
-          <p>
+        <div className="empty-state glass-card flex flex-col items-center justify-center p-12 text-center border-white/5">
+          <BookOpen className="h-12 w-12 text-slate-500 mb-3" />
+          <h3 className="text-lg font-bold text-white mb-1">No Books Allocated</h3>
+          <p className="text-sm text-slate-400 max-w-sm mb-4">
             {isAdmin 
               ? 'Get started by creating your first academic book.' 
               : 'You do not have any publications allocated to your profile yet.'}
           </p>
           {isAdmin && (
-            <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={handleAddClick}>
-              <Plus size={16} />
+            <Button onClick={handleAddClick} className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+              <Plus className="h-4 w-4 mr-1" />
               Add New Book
-            </button>
+            </Button>
           )}
         </div>
       )}
 
       {/* Add / Edit Book Modal Dialog (Admin-only) */}
       {isAdmin && (
-        <Dialog
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title={editingBook ? 'Edit Book Details' : 'Add New Book'}
-        >
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div className="form-group">
-              <label className="form-label">Book Title *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g. Principles of Quantum Computing"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="grid-cols-2">
-              <div className="form-group">
-                <label className="form-label">Subject / Discipline *</label>
-                <input
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-lg border-white/10 text-white glass-card">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-white">{editingBook ? 'Edit Book Details' : 'Add New Book'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSave} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-slate-400">Book Title *</label>
+                <Input
                   type="text"
-                  className="form-input"
-                  placeholder="e.g. Computer Science"
-                  value={discipline}
-                  onChange={e => setDiscipline(e.target.value)}
+                  className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="Principles of Quantum Computing"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Publisher *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Academic Press"
-                  value={publisher}
-                  onChange={e => setPublisher(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
 
-            <div className="grid-cols-2">
-              <div className="form-group">
-                <label className="form-label">Target Publication Date *</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={targetDate}
-                  onChange={e => setTargetDate(e.target.value)}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Subject / Discipline *</label>
+                  <Input
+                    type="text"
+                    className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="Computer Science"
+                    value={discipline}
+                    onChange={e => setDiscipline(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Publisher *</label>
+                  <Input
+                    type="text"
+                    className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="Academic Press"
+                    value={publisher}
+                    onChange={e => setPublisher(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">Total Expected Chapters</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  className="form-input"
-                  value={totalChapters}
-                  onChange={e => setTotalChapters(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
 
-            <div className="grid-cols-2">
-              <div className="form-group">
-                <label className="form-label">Allocate to Manager *</label>
-                <select
-                  className="form-select"
-                  value={assignedManagerId}
-                  onChange={e => setAssignedManagerId(e.target.value)}
-                  required
-                >
-                  <option value="" disabled>Select a Manager</option>
-                  {managers.map(m => (
-                    <option key={m.id} value={m.id}>{m.name} ({m.email})</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Target Publication Date *</label>
+                  <Input
+                    type="date"
+                    className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                    value={targetDate}
+                    onChange={e => setTargetDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Total Expected Chapters</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="50"
+                    className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                    value={totalChapters}
+                    onChange={e => setTotalChapters(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">Book Status</label>
-                <select
-                  className="form-select"
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
-                >
-                  <option value="Planning">Planning</option>
-                  <option value="Active">Active</option>
-                  <option value="Under Review">Under Review</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-            </div>
 
-            <div className="dialog-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Save Book Project
-              </button>
-            </div>
-          </form>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Allocate to Manager *</label>
+                  <select
+                    className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                    value={assignedManagerId}
+                    onChange={e => setAssignedManagerId(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled className="bg-slate-950 text-slate-400">Select a Manager</option>
+                    {managers.map(m => (
+                      <option key={m.id} value={m.id} className="bg-slate-950 text-white">{m.name} ({m.email})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-slate-400">Book Status</label>
+                  <select
+                    className="flex h-9 w-full rounded-md border border-white/10 bg-slate-900/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 text-white"
+                    value={status}
+                    onChange={e => setStatus(e.target.value)}
+                  >
+                    <option value="Planning" className="bg-slate-950 text-white">Planning</option>
+                    <option value="Active" className="bg-slate-950 text-white">Active</option>
+                    <option value="Under Review" className="bg-slate-950 text-white">Under Review</option>
+                    <option value="Completed" className="bg-slate-950 text-white">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-white/5">
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="border-white/10 text-slate-300 hover:bg-slate-800">
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+                  Save Book Project
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
         </Dialog>
       )}
     </div>

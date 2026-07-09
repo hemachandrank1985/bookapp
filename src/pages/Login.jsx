@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, Shield, Users, Mail, Lock } from 'lucide-react';
+import { BookOpen, Mail, Lock } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
 
 export default function Login({ adminsCount, onLogin, onNavigateToRegister, addToast }) {
   const [email, setEmail] = useState('');
@@ -11,55 +14,48 @@ export default function Login({ adminsCount, onLogin, onNavigateToRegister, addT
       addToast('Please enter both email and password.', 'warning');
       return;
     }
-    
-    // Dispatch login action back to App.jsx to handle async API connection
     onLogin({ email, password });
   };
 
   const hasAdmins = adminsCount > 0;
 
   return (
-    <div className="login-wrapper">
-      <div className="login-background"></div>
+    <div className="login-wrapper min-h-screen w-full flex items-center justify-center relative p-4">
+      <div className="login-background absolute inset-0 bg-radial-gradient"></div>
       
-      <div className="login-card glass-card">
-        <div className="login-header">
-          <div className="login-logo-container">
-            <BookOpen size={36} className="login-logo-icon" />
+      <Card className="w-full max-w-md glass-card border-white/10 z-10 shadow-glow">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mb-3">
+            <BookOpen className="h-6 w-6 text-indigo-400" />
           </div>
-          <h1>BookFlow Portal</h1>
-          <p className="login-subtitle">Academic Book Chapter Workflow Management</p>
-        </div>
+          <CardTitle className="text-2xl font-bold tracking-tight text-white">BookFlow Portal</CardTitle>
+          <CardDescription className="text-slate-400">Academic Book Chapter Workflow Management</CardDescription>
+        </CardHeader>
 
-        {!hasAdmins ? (
-          <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-            <div className="alert-item" style={{ borderLeftColor: 'var(--accent-warning)', background: 'rgba(234, 179, 8, 0.05)', marginBottom: '1.5rem', textAlign: 'left' }}>
-              <div className="alert-item-content">
-                <strong className="alert-item-title" style={{ color: 'var(--accent-warning)' }}>Initial Setup Required</strong>
-                <span className="alert-item-desc" style={{ fontSize: '0.8rem' }}>No administrator accounts are registered in the database. Please register the primary Administrator account to configure the portal.</span>
+        <CardContent className="pt-4">
+          {!hasAdmins ? (
+            <div className="flex flex-col gap-4 text-center">
+              <div className="rounded-lg border-l-4 border-yellow-500 bg-yellow-500/5 p-4 text-left">
+                <h5 className="font-bold text-yellow-500 text-sm">Initial Setup Required</h5>
+                <p className="text-xs text-slate-400 mt-1">No administrator accounts are registered in the database. Please register the primary Administrator account to configure the portal.</p>
               </div>
+              <Button 
+                onClick={onNavigateToRegister}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium"
+              >
+                Register Primary Admin
+              </Button>
             </div>
-            <button 
-              type="button" 
-              className="btn btn-primary" 
-              style={{ width: '100%', padding: '0.8rem' }}
-              onClick={onNavigateToRegister}
-            >
-              Register Primary Admin
-            </button>
-          </div>
-        ) : (
-          <>
-            <form onSubmit={handleSubmit} className="login-form">
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <div className="filter-input-search">
-                  <Mail size={16} style={{ left: '12px' }} />
-                  <input
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-slate-400">Email Address</label>
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
+                  <Input
                     type="email"
-                    className="form-input"
-                    style={{ paddingLeft: '2.5rem' }}
-                    placeholder="e.g. clara.sterling@bookflow.com"
+                    className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                    placeholder="clara.sterling@bookflow.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
@@ -67,14 +63,13 @@ export default function Login({ adminsCount, onLogin, onNavigateToRegister, addT
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div className="filter-input-search">
-                  <Lock size={16} style={{ left: '12px' }} />
-                  <input
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-slate-400">Password</label>
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
+                  <Input
                     type="password"
-                    className="form-input"
-                    style={{ paddingLeft: '2.5rem' }}
+                    className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
                     placeholder="Enter your password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -83,24 +78,25 @@ export default function Login({ adminsCount, onLogin, onNavigateToRegister, addT
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.8rem' }}>
+              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium mt-2">
                 Access Portal
-              </button>
+              </Button>
             </form>
+          )}
+        </CardContent>
 
-            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
-                style={{ width: '100%', padding: '0.6rem', fontSize: '0.8rem' }}
-                onClick={onNavigateToRegister}
-              >
-                Register another Admin Account
-              </button>
-            </div>
-          </>
+        {hasAdmins && (
+          <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
+            <Button 
+              variant="outline" 
+              onClick={onNavigateToRegister}
+              className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
+            >
+              Register another Admin Account
+            </Button>
+          </CardFooter>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

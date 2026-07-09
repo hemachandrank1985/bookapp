@@ -1,5 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 37% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 30% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 37% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 243 75% 66%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 243 75% 66%;
+    --radius: 0.75rem;
+  }
+}
+
+
 :root {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   

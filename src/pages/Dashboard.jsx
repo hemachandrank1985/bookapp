@@ -1,13 +1,14 @@
 import React from 'react';
 import { BookOpen, BookMarked, CheckCircle, Clock, AlertTriangle, Calendar, User, ArrowRight } from 'lucide-react';
 import { isOverdue, formatDateReadable, getDaysDifference } from '../utils/dateHelpers';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
 
 export default function Dashboard({ books = [], chapters = [], currentDate, setCurrentTab, setSelectedBookId }) {
   // 1. Calculations
   const totalBooks = books.length;
   const totalChapters = chapters.length;
   
-  const completedChaptersCount = chapters.filter(c => c.status === 'Completed').count || chapters.filter(c => c.status === 'Completed').length;
+  const completedChaptersCount = chapters.filter(c => c.status === 'Completed').length;
   const overdueChapters = chapters.filter(c => isOverdue(c.dueDate, c.status, currentDate));
   const overdueCount = overdueChapters.length;
   
@@ -28,24 +29,19 @@ export default function Dashboard({ books = [], chapters = [], currentDate, setC
     { key: 'Not Started', label: 'Not Started', color: 'notstarted' }
   ];
 
-  const statusCounts = statuses.reduce((acc, status) => {
-    if (status.key === 'Overdue') {
-      acc[status.key] = overdueCount;
-    } else {
-      // If a chapter is overdue, we count it as 'Overdue' instead of its base status for the chart
-      acc[status.key] = chapters.filter(c => c.status === status.key && !isOverdue(c.dueDate, c.status, currentDate)).length;
-    }
-    return acc;
-  }, {});
+  const statusCounts = {};
+  chapters.forEach(c => {
+    const isChapterOverdue = isOverdue(c.dueDate, c.status, currentDate);
+    const key = isChapterOverdue ? 'Overdue' : c.status;
+    statusCounts[key] = (statusCounts[key] || 0) + 1;
+  });
 
-  // Donut SVG Calculations
+  const chartTotal = Object.values(statusCounts).reduce((a, b) => a + b, 0);
   const chartData = statuses.map(s => ({
     ...s,
     value: statusCounts[s.key] || 0
   })).filter(d => d.value > 0);
 
-  const chartTotal = chartData.reduce((sum, d) => sum + d.value, 0);
-  
   let accumulatedPercent = 0;
   const donutSlices = chartData.map(d => {
     const percentage = chartTotal > 0 ? (d.value / chartTotal) * 100 : 0;
@@ -97,240 +93,273 @@ export default function Dashboard({ books = [], chapters = [], currentDate, setC
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="flex flex-col gap-6 w-full">
       {/* Page Header */}
-      <div className="page-header">
-        <div className="page-title-group">
-          <h1>Editorial Dashboard</h1>
-          <span className="page-subtitle">Academic project progress tracking and statistics</span>
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold tracking-tight text-white">Editorial Dashboard</h1>
+          <span className="text-sm text-slate-400">Academic project progress tracking and statistics</span>
         </div>
       </div>
 
       {/* KPI Section */}
-      <div className="kpi-container">
-        <div className="kpi-card glass-card" style={{ '--card-accent': 'var(--accent-primary)' }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Total Books</span>
-            <BookOpen size={20} className="kpi-icon" />
-          </div>
-          <div className="kpi-value">{totalBooks}</div>
-          <div className="kpi-footer">Active academic projects</div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <Card className="glass-card border-indigo-500/20 shadow-glow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <span className="text-sm font-medium text-slate-400">Total Books</span>
+            <BookOpen className="h-4 w-4 text-indigo-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{totalBooks}</div>
+            <p className="text-xs text-slate-500 mt-1">Active academic projects</p>
+          </CardContent>
+        </Card>
 
-        <div className="kpi-card glass-card" style={{ '--card-accent': 'var(--accent-primary)' }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Total Chapters</span>
-            <BookMarked size={20} className="kpi-icon" />
-          </div>
-          <div className="kpi-value">{totalChapters}</div>
-          <div className="kpi-footer">Across all publications</div>
-        </div>
+        <Card className="glass-card border-indigo-500/20 shadow-glow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <span className="text-sm font-medium text-slate-400">Total Chapters</span>
+            <BookMarked className="h-4 w-4 text-indigo-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{totalChapters}</div>
+            <p className="text-xs text-slate-500 mt-1">Across all publications</p>
+          </CardContent>
+        </Card>
 
-        <div className="kpi-card glass-card" style={{ '--card-accent': 'var(--accent-success)' }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Completed</span>
-            <CheckCircle size={20} className="kpi-icon" />
-          </div>
-          <div className="kpi-value">{completedChaptersCount}</div>
-          <div className="kpi-footer">{completionPercentage}% overall completion</div>
-          <div className="kpi-progress-bar">
-            <div className="kpi-progress-fill" style={{ width: `${completionPercentage}%` }}></div>
-          </div>
-        </div>
+        <Card className="glass-card border-emerald-500/20 shadow-glow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <span className="text-sm font-medium text-slate-400">Completed</span>
+            <CheckCircle className="h-4 w-4 text-emerald-400" />
+          </CardHeader>
+          <CardContent className="flex flex-col">
+            <div className="text-2xl font-bold text-white">{completedChaptersCount}</div>
+            <p className="text-xs text-slate-500 mt-1 mb-2">{completionPercentage}% overall completion</p>
+            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="kpi-card glass-card" style={{ '--card-accent': 'var(--accent-orange)' }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Pending</span>
-            <Clock size={20} className="kpi-icon" />
-          </div>
-          <div className="kpi-value">{pendingCount}</div>
-          <div className="kpi-footer">Active chapters in progress</div>
-        </div>
+        <Card className="glass-card border-orange-500/20 shadow-glow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <span className="text-sm font-medium text-slate-400">Pending</span>
+            <Clock className="h-4 w-4 text-orange-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{pendingCount}</div>
+            <p className="text-xs text-slate-500 mt-1">Active chapters in progress</p>
+          </CardContent>
+        </Card>
 
-        <div className="kpi-card glass-card" style={{ '--card-accent': 'var(--accent-danger)' }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Overdue</span>
-            <AlertTriangle size={20} className="kpi-icon" />
-          </div>
-          <div className="kpi-value" style={{ color: 'var(--accent-danger)' }}>{overdueCount}</div>
-          <div className="kpi-footer">Requires immediate attention</div>
-        </div>
+        <Card className="glass-card border-red-500/20 shadow-glow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <span className="text-sm font-medium text-slate-400">Overdue</span>
+            <AlertTriangle className="h-4 w-4 text-red-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-400">{overdueCount}</div>
+            <p className="text-xs text-slate-500 mt-1">Requires immediate attention</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Section */}
-      <div className="charts-grid">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Bar chart - breakdown per book */}
-        <div className="chart-card glass-card">
-          <div className="chart-header">
-            <h3 className="chart-title">Chapter Progress per Book</h3>
-          </div>
-          <div className="chart-body">
-            <div className="bar-chart-wrapper">
-              {bookProgressData.map(book => (
-                <div key={book.id} className="bar-row">
-                  <div
-                    className="bar-label"
-                    title={book.title}
-                    onClick={() => handleBookClick(book.id)}
-                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                  >
-                    {book.title}
+        <Card className="md:col-span-2 glass-card">
+          <CardHeader>
+            <CardTitle>Chapter Progress per Book</CardTitle>
+            <CardDescription>Visual breakdown of chapter stages across active publications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              {bookProgressData.length > 0 ? (
+                bookProgressData.map(book => (
+                  <div key={book.id} className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                    <div
+                      className="text-sm font-semibold text-slate-300 truncate w-full md:w-1/4 hover:underline cursor-pointer"
+                      title={book.title}
+                      onClick={() => handleBookClick(book.id)}
+                    >
+                      {book.title}
+                    </div>
+                    <div className="flex-1 flex bg-slate-800/50 rounded overflow-hidden h-4 items-center">
+                      {book.completedPercent > 0 && (
+                        <div className="bg-emerald-500 h-full" style={{ width: `${book.completedPercent}%` }} title={`Completed: ${book.completedPercent}%`} />
+                      )}
+                      {book.inprogressPercent > 0 && (
+                        <div className="bg-orange-500 h-full" style={{ width: `${book.inprogressPercent}%` }} title={`In Progress: ${book.inprogressPercent}%`} />
+                      )}
+                      {book.overduePercent > 0 && (
+                        <div className="bg-red-500 h-full" style={{ width: `${book.overduePercent}%` }} title={`Overdue: ${book.overduePercent}%`} />
+                      )}
+                      {book.notstartedPercent > 0 && (
+                        <div className="bg-slate-600 h-full" style={{ width: `${book.notstartedPercent}%` }} title={`Not Started: ${book.notstartedPercent}%`} />
+                      )}
+                    </div>
+                    <div className="text-right text-xs font-semibold text-slate-400 md:w-16">{book.completedPercent}%</div>
                   </div>
-                  <div className="bar-container">
-                    {book.completedPercent > 0 && (
-                      <div className="bar-segment completed" style={{ width: `${book.completedPercent}%` }} title={`Completed: ${book.completedPercent}%`} />
-                    )}
-                    {book.inprogressPercent > 0 && (
-                      <div className="bar-segment inprogress" style={{ width: `${book.inprogressPercent}%` }} title={`In Progress: ${book.inprogressPercent}%`} />
-                    )}
-                    {book.overduePercent > 0 && (
-                      <div className="bar-segment overdue" style={{ width: `${book.overduePercent}%` }} title={`Overdue: ${book.overduePercent}%`} />
-                    )}
-                    {book.notstartedPercent > 0 && (
-                      <div className="bar-segment notstarted" style={{ width: `${book.notstartedPercent}%` }} title={`Not Started: ${book.notstartedPercent}%`} />
-                    )}
-                  </div>
-                  <div className="bar-value">{book.completedPercent}%</div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-slate-500 text-sm py-8">No book projects available.</div>
+              )}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Donut chart - status breakdown */}
-        <div className="chart-card glass-card" style={{ position: 'relative' }}>
-          <div className="chart-header">
-            <h3 className="chart-title">Status Breakdown</h3>
-          </div>
-          <div className="chart-body" style={{ flexDirection: 'column' }}>
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle>Status Breakdown</CardTitle>
+            <CardDescription>Aggregation of chapter statuses</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center gap-6">
             {chartTotal > 0 ? (
-              <div style={{ position: 'relative', width: '160px', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="100%" height="100%" viewBox="0 0 42 42" className="donut-chart-svg">
-                  <circle cx="21" cy="21" r="15.91549430918954" className="donut-hole" />
-                  <circle cx="21" cy="21" r="15.91549430918954" stroke="rgba(255,255,255,0.03)" strokeWidth="4.5" fill="transparent" />
-                  {donutSlices.map(slice => (
-                    <circle
-                      key={slice.key}
-                      cx="21"
-                      cy="21"
-                      r="15.91549430918954"
-                      className={`donut-segment ${slice.color}`}
-                      strokeDasharray={slice.strokeDash}
-                      strokeDashoffset={slice.strokeOffset}
-                      strokeWidth="4.5"
-                      fill="transparent"
-                    />
-                  ))}
+              <div className="relative w-40 h-40 flex items-center justify-center">
+                <svg width="100%" height="100%" viewBox="0 0 42 42" className="transform -rotate-90">
+                  <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="4.5" />
+                  {donutSlices.map(slice => {
+                    let strokeColor = "#cbd5e1"; // notstarted
+                    if (slice.color === "completed") strokeColor = "#10b981";
+                    else if (slice.color === "inprogress") strokeColor = "#f97316";
+                    else if (slice.color === "review") strokeColor = "#eab308";
+                    else if (slice.color === "overdue") strokeColor = "#ef4444";
+                    
+                    return (
+                      <circle
+                        key={slice.key}
+                        cx="21"
+                        cy="21"
+                        r="15.91549430918954"
+                        fill="transparent"
+                        stroke={strokeColor}
+                        strokeDasharray={slice.strokeDash}
+                        strokeDashoffset={slice.strokeOffset}
+                        strokeWidth="4.5"
+                      />
+                    );
+                  })}
                 </svg>
-                <div className="donut-center-text">
-                  <span className="donut-center-val">{totalChapters}</span>
-                  <span className="donut-center-lbl">Chapters</span>
+                <div className="absolute flex flex-col items-center justify-center text-center">
+                  <span className="text-2xl font-bold text-white leading-none">{totalChapters}</span>
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mt-1">Chapters</span>
                 </div>
               </div>
             ) : (
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>No data available</div>
+              <div className="text-slate-500 text-sm py-12">No data available</div>
             )}
             
-            <div className="chart-legend">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full text-xs text-slate-400">
               {statuses.map(s => {
                 const count = statusCounts[s.key] || 0;
+                let dotColor = "bg-slate-500";
+                if (s.color === "completed") dotColor = "bg-emerald-500";
+                else if (s.color === "inprogress") dotColor = "bg-orange-500";
+                else if (s.color === "review") dotColor = "bg-yellow-500";
+                else if (s.color === "overdue") dotColor = "bg-red-500";
+
                 return (
-                  <div key={s.key} className="legend-item" style={{ opacity: count > 0 ? 1 : 0.5 }}>
-                    <div className={`legend-color status-badge ${s.color}`} style={{ width: '8px', height: '8px', padding: 0 }}></div>
-                    <span>{s.label} ({count})</span>
+                  <div key={s.key} className="flex items-center gap-1.5" style={{ opacity: count > 0 ? 1 : 0.4 }}>
+                    <div className={`w-2 h-2 rounded-full ${dotColor}`}></div>
+                    <span className="truncate">{s.label}: {count}</span>
                   </div>
                 );
               })}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Bottom Section: Timeline & Overdue Alerts */}
-      <div className="timeline-alerts-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Timeline View */}
-        <div className="timeline-card glass-card">
-          <div className="chart-header">
-            <h3 className="chart-title">Upcoming Deadlines (Next 30 Days)</h3>
-            <Calendar size={18} className="kpi-icon" />
-          </div>
-          <div className="timeline-list">
-            {upcomingChapters.length > 0 ? (
-              upcomingChapters.map(chapter => {
-                const book = books.find(b => b.id === chapter.bookId);
-                const diffDays = getDaysDifference(currentDate, chapter.dueDate);
-                let timelineColor = 'var(--text-secondary)';
-                if (diffDays === 0) timelineColor = 'var(--accent-danger)';
-                else if (diffDays <= 7) timelineColor = 'var(--accent-orange)';
-                else if (diffDays <= 14) timelineColor = 'var(--accent-warning)';
+        <Card className="glass-card">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <div>
+              <CardTitle>Upcoming Deadlines</CardTitle>
+              <CardDescription>Submissions due in the next 30 days</CardDescription>
+            </div>
+            <Calendar className="h-5 w-5 text-indigo-400" />
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="flex flex-col gap-4">
+              {upcomingChapters.length > 0 ? (
+                upcomingChapters.map(chapter => {
+                  const book = books.find(b => b.id === chapter.bookId);
+                  const diffDays = getDaysDifference(currentDate, chapter.dueDate);
+                  let badgeColor = "bg-slate-800 text-slate-300";
+                  if (diffDays === 0) badgeColor = "bg-red-500/10 text-red-400 border border-red-500/20";
+                  else if (diffDays <= 7) badgeColor = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+                  else if (diffDays <= 14) badgeColor = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
 
-                return (
-                  <div key={chapter.id} className="timeline-item" style={{ '--timeline-color': timelineColor }}>
-                    <div className="timeline-indicator">
-                      <Clock size={14} />
-                    </div>
-                    <div className="timeline-content">
-                      <div className="timeline-content-header">
-                        <span className="timeline-title">Ch {chapter.chapterNumber}: {chapter.chapterTitle}</span>
-                        <span className="timeline-date">
-                          {diffDays === 0 ? 'Due Today' : `In ${diffDays} days`}
-                        </span>
+                  return (
+                    <div key={chapter.id} className="flex items-start gap-3 border-l-2 border-indigo-500/40 pl-3">
+                      <div className="flex-1 flex flex-col gap-0.5">
+                        <span className="text-sm font-semibold text-slate-200">Ch {chapter.chapterNumber}: {chapter.chapterTitle}</span>
+                        <span className="text-xs text-slate-500">Book: {book?.title}</span>
+                        <span className="text-xs text-slate-400 mt-1">Author: {chapter.authorName} ({formatDateReadable(chapter.dueDate)})</span>
                       </div>
-                      <div className="timeline-book">Book: {book?.title}</div>
-                      <div className="timeline-author">Author: {chapter.authorName} ({formatDateReadable(chapter.dueDate)})</div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="empty-state" style={{ padding: '2rem' }}>
-                <Calendar size={36} />
-                <h3>No upcoming deadlines</h3>
-                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>There are no chapter submissions due in the next 30 days.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Color-coded Overdue Alerts */}
-        <div className="alerts-card glass-card">
-          <div className="chart-header">
-            <h3 className="chart-title" style={{ color: 'var(--accent-danger)' }}>Overdue Alerts</h3>
-            <AlertTriangle size={18} style={{ color: 'var(--accent-danger)' }} />
-          </div>
-          <div className="alerts-list">
-            {overdueCount > 0 ? (
-              overdueChapters.map(chapter => {
-                const book = books.find(b => b.id === chapter.bookId);
-                const diffDays = getDaysDifference(chapter.dueDate, currentDate);
-                return (
-                  <div key={chapter.id} className="alert-item">
-                    <div className="alert-item-content">
-                      <span className="alert-item-title">Ch {chapter.chapterNumber}: {chapter.chapterTitle}</span>
-                      <span className="alert-item-desc">Book: {book?.title}</span>
-                      <span className="alert-item-meta">
-                        Author: {chapter.authorName} | Overdue by <strong style={{ color: 'var(--accent-danger)' }}>{diffDays} days</strong> (Due {formatDateReadable(chapter.dueDate)})
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeColor}`}>
+                        {diffDays === 0 ? 'Due Today' : `In ${diffDays} days`}
                       </span>
                     </div>
-                    <button
-                      className="alert-ack-btn"
-                      title="Nudge Author (Chapters Tab)"
-                      onClick={() => handleBookClick(chapter.bookId)}
-                    >
-                      <ArrowRight size={14} />
-                    </button>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="empty-state" style={{ padding: '2rem' }}>
-                <CheckCircle size={36} style={{ color: 'var(--accent-success)' }} />
-                <h3 style={{ color: 'var(--accent-success)' }}>All chapters on track</h3>
-                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>No chapters are currently overdue based on the simulated today's date.</p>
-              </div>
-            )}
-          </div>
-        </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500 gap-2">
+                  <Calendar className="h-8 w-8 text-slate-600" />
+                  <span className="text-sm">No upcoming deadlines</span>
+                  <p className="text-xs text-slate-600">No submissions are due in the next 30 days.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Color-coded Overdue Alerts */}
+        <Card className="glass-card border-red-500/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <div>
+              <CardTitle className="text-red-400">Overdue Alerts</CardTitle>
+              <CardDescription>Chapters requiring immediate editorial contact</CardDescription>
+            </div>
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="flex flex-col gap-3">
+              {overdueCount > 0 ? (
+                overdueChapters.map(chapter => {
+                  const book = books.find(b => b.id === chapter.bookId);
+                  const diffDays = getDaysDifference(chapter.dueDate, currentDate);
+                  return (
+                    <div key={chapter.id} className="flex items-center justify-between bg-red-500/5 border border-red-500/10 rounded-lg p-3 hover:bg-red-500/8 transition-colors">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-semibold text-slate-200">Ch {chapter.chapterNumber}: {chapter.chapterTitle}</span>
+                        <span className="text-xs text-slate-500">Book: {book?.title}</span>
+                        <span className="text-xs text-slate-400 mt-1">
+                          Author: {chapter.authorName} | Overdue by <strong className="text-red-400">{diffDays} days</strong>
+                        </span>
+                      </div>
+                      <button
+                        className="p-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+                        title="View in Chapter Tracker"
+                        onClick={() => handleBookClick(chapter.bookId)}
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500 gap-2">
+                  <CheckCircle className="h-8 w-8 text-emerald-400/80" />
+                  <span className="text-sm text-emerald-400/80 font-medium">All chapters on track</span>
+                  <p className="text-xs text-slate-600">No chapters are currently overdue.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

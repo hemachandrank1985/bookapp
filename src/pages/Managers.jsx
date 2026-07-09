@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, UserX, UserPlus, Mail } from 'lucide-react';
-import Dialog from '../components/Dialog';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../components/ui/table';
 
 export default function Managers({
-  managers,
-  books,
-  chapters,
+  managers = [],
+  books = [],
+  chapters = [],
   addToast,
   refreshData
 }) {
@@ -80,151 +84,152 @@ export default function Managers({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="flex flex-col gap-6 w-full">
       {/* Page Header */}
-      <div className="page-header">
-        <div className="page-title-group">
-          <h1>Editorial Staff (Managers)</h1>
-          <span className="page-subtitle">Configure editorial staff, audit workloads, and adjust book ownership</span>
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold tracking-tight text-white">Editorial Staff (Managers)</h1>
+          <span className="text-sm text-slate-400">Configure editorial staff, audit workloads, and adjust book ownership</span>
         </div>
-        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-          <UserPlus size={16} />
+        <Button onClick={() => setIsModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium gap-1">
+          <UserPlus className="h-4 w-4" />
           Register Manager
-        </button>
+        </Button>
       </div>
 
       {/* Managers Table */}
       {managers.length > 0 ? (
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
-          <div className="table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Manager Name</th>
-                  <th>Email Address</th>
-                  <th style={{ textAlign: 'center' }}>Allocated Books</th>
-                  <th style={{ textAlign: 'center' }}>Chapters Monitored</th>
-                  <th>Assigned Publications</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+        <Card className="glass-card border-white/5 overflow-hidden">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-slate-900/40">
+                <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableHead className="text-slate-400 font-bold">Manager Name</TableHead>
+                  <TableHead className="text-slate-400 font-bold">Email Address</TableHead>
+                  <TableHead className="text-center text-slate-400 font-bold">Allocated Books</TableHead>
+                  <TableHead className="text-center text-slate-400 font-bold">Chapters Monitored</TableHead>
+                  <TableHead className="text-slate-400 font-bold">Assigned Publications</TableHead>
+                  <TableHead className="text-slate-400 font-bold">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {managers.map(manager => {
                   const workload = getManagerWorkload(manager.id);
                   return (
-                    <tr key={manager.id}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <div className="nav-user-avatar" style={{ width: '28px', height: '28px', fontSize: '0.75rem' }}>
+                    <TableRow key={manager.id} className="border-white/5 hover:bg-slate-900/10">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-xs font-bold text-indigo-400">
                             {manager.name.split(' ').map(n => n[0]).join('')}
                           </div>
-                          <span style={{ fontWeight: '700' }}>{manager.name}</span>
+                          <span className="font-bold text-slate-200">{manager.name}</span>
                         </div>
-                      </td>
-                      <td>{manager.email}</td>
-                      <td style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '0.95rem' }}>
+                      </TableCell>
+                      <TableCell className="text-slate-300">{manager.email}</TableCell>
+                      <TableCell className="text-center font-bold text-slate-200 text-base">
                         {workload.booksCount}
-                      </td>
-                      <td style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--accent-orange)' }}>
+                      </TableCell>
+                      <TableCell className="text-center font-bold text-orange-400 text-base">
                         {workload.chaptersCount}
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {workload.books.length > 0 ? (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                          <div className="flex flex-wrap gap-1.5 max-w-sm">
                             {workload.books.map(b => (
-                              <span key={b.id} className="text-badge text-badge-success" style={{ fontSize: '0.68rem' }}>
+                              <span key={b.id} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate" style={{ maxWidth: '120px' }}>
                                 {b.title}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>
-                            None Assigned
-                          </span>
+                          <span className="text-slate-500 text-xs italic">None Assigned</span>
                         )}
-                      </td>
-                      <td>
-                        <button
-                          className="inline-edit-note-btn"
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-red-500/10 text-slate-400 hover:text-red-400"
                           onClick={() => handleDelete(manager.id, manager.name)}
                           title="Delete Manager"
                         >
-                          <UserX size={14} style={{ color: 'var(--accent-danger)' }} />
-                        </button>
-                      </td>
-                    </tr>
+                          <UserX className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="empty-state glass-card">
-          <UserPlus size={48} />
-          <h3>No Managers Registered</h3>
-          <p>Please register a project manager to assign books and monitor workflows.</p>
-          <button className="btn btn-primary" style={{ marginTop: '1.5rem' }} onClick={() => setIsModalOpen(true)}>
-            <UserPlus size={16} />
+        <div className="empty-state glass-card flex flex-col items-center justify-center p-12 text-center border-white/5">
+          <UserPlus className="h-12 w-12 text-slate-500 mb-3" />
+          <h3 className="text-lg font-bold text-white mb-1">No Managers Registered</h3>
+          <p className="text-sm text-slate-400 max-w-sm mb-4">Please register a project manager to assign books and monitor workflows.</p>
+          <Button onClick={() => setIsModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+            <UserPlus className="h-4 w-4 mr-1" />
             Register Manager
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Register Manager Modal */}
-      <Dialog
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Register New Project Manager"
-      >
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div className="form-group">
-            <label className="form-label">Full Name *</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="e.g. Mary Curie"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Email Address *</label>
-            <div className="filter-input-search">
-              <Mail size={14} />
-              <input
-                type="email"
-                className="form-input"
-                placeholder="e.g. mary.curie@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-md border-white/10 text-white glass-card">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">Register New Project Manager</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSave} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Full Name *</label>
+              <Input
+                type="text"
+                className="bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                placeholder="Mary Curie"
+                value={name}
+                onChange={e => setName(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">Security Password *</label>
-            <input
-              type="password"
-              className="form-input"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Email Address *</label>
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="email"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="mary.curie@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-          <div className="dialog-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Register Account
-            </button>
-          </div>
-        </form>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Security Password *</label>
+              <Input
+                type="password"
+                className="bg-slate-900/50 border-white/10 text-white focus-visible:ring-indigo-500"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4 pt-2 border-t border-white/5">
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="border-white/10 text-slate-300 hover:bg-slate-800">
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
+                Register Account
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
     </div>
   );

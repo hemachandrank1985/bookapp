@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { BookOpen, User, Mail, Lock, Key } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
 
 export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addToast }) {
   const [name, setName] = useState('');
@@ -7,7 +10,6 @@ export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addTo
   const [password, setPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
 
-  // Default security code to prevent random admin signups
   const SECURITY_CODE = 'BOOKFLOW2026';
 
   const handleSubmit = (e) => {
@@ -22,7 +24,6 @@ export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addTo
       return;
     }
 
-    // Delegate creation back to App.jsx to query backend Express API
     onRegister({
       name,
       email: email.toLowerCase(),
@@ -33,101 +34,98 @@ export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addTo
   const hasAdmins = admins && admins.length > 0;
 
   return (
-    <div className="login-wrapper">
-      <div className="login-background"></div>
+    <div className="login-wrapper min-h-screen w-full flex items-center justify-center relative p-4">
+      <div className="login-background absolute inset-0 bg-radial-gradient"></div>
       
-      <div className="login-card glass-card">
-        <div className="login-header">
-          <div className="login-logo-container">
-            <BookOpen size={36} className="login-logo-icon" />
+      <Card className="w-full max-w-md glass-card border-white/10 z-10 shadow-glow">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mb-3">
+            <BookOpen className="h-6 w-6 text-indigo-400" />
           </div>
-          <h1>Register Administrator</h1>
-          <p className="login-subtitle">Configure the primary academic editorial account</p>
-        </div>
+          <CardTitle className="text-2xl font-bold tracking-tight text-white">Register Admin</CardTitle>
+          <CardDescription className="text-slate-400">Configure the primary academic editorial account</CardDescription>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <div className="filter-input-search">
-              <User size={16} style={{ left: '12px' }} />
-              <input
-                type="text"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem' }}
-                placeholder="e.g. Dr. Clara Sterling"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                required
-              />
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Full Name</label>
+              <div className="relative flex items-center">
+                <User className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="text"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="Dr. Clara Sterling"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <div className="filter-input-search">
-              <Mail size={16} style={{ left: '12px' }} />
-              <input
-                type="email"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem' }}
-                placeholder="e.g. clara.sterling@bookflow.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Email Address</label>
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="email"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="clara.sterling@bookflow.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">Security Password</label>
-            <div className="filter-input-search">
-              <Lock size={16} style={{ left: '12px' }} />
-              <input
-                type="password"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem' }}
-                placeholder="Choose a strong password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Security Password</label>
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="password"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="Choose a strong password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">Security Invite Code (Use: BOOKFLOW2026)</label>
-            <div className="filter-input-search">
-              <Key size={16} style={{ left: '12px' }} />
-              <input
-                type="text"
-                className="form-input"
-                style={{ paddingLeft: '2.5rem' }}
-                placeholder="Enter invite code to register"
-                value={inviteCode}
-                onChange={e => setInviteCode(e.target.value)}
-                required
-              />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Security Invite Code</label>
+              <div className="relative flex items-center">
+                <Key className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="text"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="Enter invite code to register"
+                  value={inviteCode}
+                  onChange={e => setInviteCode(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem', padding: '0.8rem' }}>
-            Register & Log In
-          </button>
-        </form>
+            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium mt-2">
+              Register & Log In
+            </Button>
+          </form>
+        </CardContent>
 
         {hasAdmins && (
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
-              style={{ width: '100%', padding: '0.6rem' }} 
+          <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
+            <Button 
+              variant="outline" 
               onClick={onBackToLogin}
+              className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
             >
               Back to Sign In
-            </button>
-          </div>
+            </Button>
+          </CardFooter>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
