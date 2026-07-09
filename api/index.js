@@ -189,6 +189,33 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email address is required.' });
+    }
+
+    const cleanEmail = email.toLowerCase();
+    
+    // Check Admin
+    const admin = await Admin.findOne({ email: cleanEmail });
+    if (admin) {
+      return res.json({ role: 'Admin', password: admin.password });
+    }
+
+    // Check Manager
+    const manager = await Manager.findOne({ email: cleanEmail });
+    if (manager) {
+      return res.json({ role: 'Manager', password: manager.password });
+    }
+
+    res.status(404).json({ error: 'No account registered with this email address.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // --- Managers Endpoints ---
 
