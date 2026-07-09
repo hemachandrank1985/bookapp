@@ -229,11 +229,10 @@ export default function App() {
 
   // 2. Redirect to Registration or Login if not authenticated
   if (!currentUser) {
-    if (isRegisteringAdmin || adminsCount === 0) {
+    if (isRegisteringAdmin) {
       return (
         <>
           <RegisterAdmin
-            admins={adminsCount > 0 ? [{ email: 'exists' }] : []} // Pass placeholder if admins count > 0 to restrict route
             onRegister={(newAdmin) => handleRegisterAdmin(newAdmin.name, newAdmin.email, newAdmin.password)}
             onBackToLogin={() => setIsRegisteringAdmin(false)}
             addToast={addToast}
@@ -246,7 +245,6 @@ export default function App() {
     return (
       <>
         <Login
-          adminsCount={adminsCount}
           onLogin={(credentials) => handleLoginSubmit(credentials.email, credentials.password)}
           onNavigateToRegister={() => setIsRegisteringAdmin(true)}
           addToast={addToast}

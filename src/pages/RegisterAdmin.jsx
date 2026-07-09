@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
-import { BookOpen, User, Mail, Lock, Key } from 'lucide-react';
+import { BookOpen, User, Mail, Lock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 
-export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addToast }) {
+export default function RegisterAdmin({ onRegister, onBackToLogin, addToast }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
-
-  const SECURITY_CODE = 'BOOKFLOW2026';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !password || !inviteCode) {
+    if (!name || !email || !password) {
       addToast('Please fill in all fields.', 'warning');
-      return;
-    }
-
-    if (inviteCode !== SECURITY_CODE) {
-      addToast('Invalid Security Invite Code. Registration denied.', 'error');
       return;
     }
 
@@ -30,8 +22,6 @@ export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addTo
       password
     });
   };
-
-  const hasAdmins = admins && admins.length > 0;
 
   return (
     <div className="login-wrapper min-h-screen w-full flex items-center justify-center relative p-4">
@@ -93,38 +83,21 @@ export default function RegisterAdmin({ admins, onRegister, onBackToLogin, addTo
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-400">Security Invite Code</label>
-              <div className="relative flex items-center">
-                <Key className="absolute left-3 h-4 w-4 text-slate-500" />
-                <Input
-                  type="text"
-                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
-                  placeholder="Enter invite code to register"
-                  value={inviteCode}
-                  onChange={e => setInviteCode(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
             <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium mt-2">
               Register & Log In
             </Button>
           </form>
         </CardContent>
 
-        {hasAdmins && (
-          <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
-            <Button 
-              variant="outline" 
-              onClick={onBackToLogin}
-              className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
-            >
-              Back to Sign In
-            </Button>
-          </CardFooter>
-        )}
+        <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
+          <Button 
+            variant="outline" 
+            onClick={onBackToLogin}
+            className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
+          >
+            Back to Sign In
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 
-export default function Login({ adminsCount, onLogin, onNavigateToRegister, addToast }) {
+export default function Login({ onLogin, onNavigateToRegister, addToast }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -16,8 +16,6 @@ export default function Login({ adminsCount, onLogin, onNavigateToRegister, addT
     }
     onLogin({ email, password });
   };
-
-  const hasAdmins = adminsCount > 0;
 
   return (
     <div className="login-wrapper min-h-screen w-full flex items-center justify-center relative p-4">
@@ -33,69 +31,52 @@ export default function Login({ adminsCount, onLogin, onNavigateToRegister, addT
         </CardHeader>
 
         <CardContent className="pt-4">
-          {!hasAdmins ? (
-            <div className="flex flex-col gap-4 text-center">
-              <div className="rounded-lg border-l-4 border-yellow-500 bg-yellow-500/5 p-4 text-left">
-                <h5 className="font-bold text-yellow-500 text-sm">Initial Setup Required</h5>
-                <p className="text-xs text-slate-400 mt-1">No administrator accounts are registered in the database. Please register the primary Administrator account to configure the portal.</p>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Email Address</label>
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="email"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="clara.sterling@bookflow.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
               </div>
-              <Button 
-                onClick={onNavigateToRegister}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium"
-              >
-                Register Primary Admin
-              </Button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-400">Email Address</label>
-                <div className="relative flex items-center">
-                  <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
-                  <Input
-                    type="email"
-                    className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
-                    placeholder="clara.sterling@bookflow.com"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-400">Password</label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
-                  <Input
-                    type="password"
-                    className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-400">Password</label>
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="password"
+                  className="pl-10 bg-slate-900/50 border-white/10 text-white placeholder-slate-500 focus-visible:ring-indigo-500"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
               </div>
+            </div>
 
-              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium mt-2">
-                Access Portal
-              </Button>
-            </form>
-          )}
+            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium mt-2">
+              Access Portal
+            </Button>
+          </form>
         </CardContent>
 
-        {hasAdmins && (
-          <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
-            <Button 
-              variant="outline" 
-              onClick={onNavigateToRegister}
-              className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
-            >
-              Register another Admin Account
-            </Button>
-          </CardFooter>
-        )}
+        <CardFooter className="flex flex-col gap-2 pt-2 border-t border-white/5">
+          <Button 
+            variant="outline" 
+            onClick={onNavigateToRegister}
+            className="w-full border-white/10 text-slate-300 hover:bg-slate-800 hover:text-white"
+          >
+            Register new Admin Account
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );
