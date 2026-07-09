@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Eye, User } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, User, BookOpen } from 'lucide-react';
 import Dialog from '../components/Dialog';
 import { formatDateReadable } from '../utils/dateHelpers';
 
